@@ -1,4 +1,4 @@
-﻿using GHelper.Helpers;
+using GHelper.Helpers;
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -390,23 +390,10 @@ namespace GHelper.AnimeMatrix
 
         void StopAudio()
         {
-            AudioVisualizer.Shared.Unsubscribe(PresentAudio);
         }
 
         void SetAudio()
         {
-            if (deviceMatrix is not null)
-            {
-                matrixSpectrogram = AppConfig.Get("matrix_audio_mode", 0) == 1;
-                spectroSlices.Clear();
-                deviceMatrix.ClearFrames();
-                deviceMatrix.SetBuiltInAnimation(false);
-            }
-            else if (deviceSlash is not null) deviceSlash.SetEmpty();
-            else return;
-
-            slashBrightness = AppConfig.Get("matrix_brightness", 0);
-            AudioVisualizer.Shared.Subscribe(PresentAudio);
         }
 
         void PresentAudio(double[] audio)
