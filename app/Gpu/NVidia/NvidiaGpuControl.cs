@@ -1,4 +1,4 @@
-﻿using GHelper.Helpers;
+using GHelper.Helpers;
 using NvAPIWrapper.GPU;
 using NvAPIWrapper.Native;
 using NvAPIWrapper.Native.GPU;
@@ -62,7 +62,8 @@ public class NvidiaGpuControl : IGpuControl
     private GpuState GetGpuState()
     {
         if (!IsValid) return GpuState.Off;
-        if (Environment.TickCount64 - _lastStateTime < StateCacheMs) return _lastState;
+        int cacheDuration = _lastState == GpuState.Asleep ? 5000 : StateCacheMs;
+        if (Environment.TickCount64 - _lastStateTime < cacheDuration) return _lastState;
         try
         {
             var perfState = GPUApi.GetCurrentPerformanceState(_internalGpu!.Handle);
@@ -99,9 +100,13 @@ public class NvidiaGpuControl : IGpuControl
         if (!IsValid) return null;
 
         var state = GetGpuState();
-        if (state == GpuState.Off) return null;
+        if (state != GpuState.Active)
+        {
+            _lastTemp = null;
+            return null;
+        }
 
-        if ((_readTask?.IsCompleted ?? true) && (state == GpuState.Active || ShouldRefresh()))
+        if ((_readTask?.IsCompleted ?? true))
         {
             _readTask = Task.Run(() =>
             {

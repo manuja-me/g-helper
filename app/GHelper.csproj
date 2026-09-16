@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -21,6 +21,13 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <AssemblyVersion>0.283</AssemblyVersion>
     <NoWarn>$(NoWarn);WFO1000</NoWarn>
+    <!-- Resource and Performance Optimizations -->
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+    <TieredCompilation>true</TieredCompilation>
+    <TieredPGO>true</TieredPGO>
+    <Optimize>true</Optimize>
   </PropertyGroup>
 
   <ItemGroup>
@@ -85,6 +92,6 @@
 	</Target>
 
 	<Target Name="ZipSingleExe" AfterTargets="Publish" Condition="'$(GITHUB_ACTIONS)'!='true'">
-		<Exec Command="powershell -NoProfile -Command &quot;$exe = '$(PublishDir)GHelper.exe'; for ($i = 0; $i -lt 30; $i++) { try { [IO.File]::Open($exe, 'Open', 'Read', 'None').Close(); break } catch { Start-Sleep -Milliseconds 200 } }; Compress-Archive -Path $exe -DestinationPath '$(PublishDir)GHelper.zip' -Force&quot;" />
+		<Exec Command="tar.exe -a -c -f &quot;$(PublishDir)GHelper.zip&quot; -C &quot;$(PublishDir).&quot; GHelper.exe" />
 	</Target>
 </Project>

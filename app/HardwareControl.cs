@@ -497,18 +497,18 @@ public static class HardwareControl
 
     public static float? GetGPUTemp()
     {
+        if (AppConfig.NoGpu() || AppConfig.Get("gpu_mode") == AsusACPI.GPUModeEco) return null;
+
         try
         {
             gpuTemp = GpuControl?.GetCurrentTemperature();
-
         }
         catch (Exception)
         {
             gpuTemp = -1;
-            //Debug.WriteLine("Failed reading GPU temp :" + ex.Message);
         }
 
-        if (gpuTemp is null || gpuTemp < 0 || gpuTemp >= 125)
+        if (gpuTemp is not null && (gpuTemp < 0 || gpuTemp >= 125))
         {
             int acpiTemp = Program.acpi.DeviceGet(AsusACPI.Temp_GPU);
             gpuTemp = (acpiTemp > 0 && acpiTemp < 125) ? acpiTemp : null;

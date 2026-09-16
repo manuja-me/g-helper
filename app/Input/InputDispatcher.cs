@@ -81,12 +81,14 @@ namespace GHelper.Input
             {
                 backlightActivity = false;
                 Aura.ApplyBrightness(0, "Timeout");
+                timer.Interval = 2500;
             }
 
             if (!backlightActivity && iddle.TotalSeconds < kb_timeout)
             {
                 backlightActivity = true;
                 SetBacklightAuto();
+                timer.Interval = AppConfig.Get("keyboard_timeout_refresh", 1000);
             }
 
             //Logger.WriteLine("Iddle: " + iddle.TotalSeconds);

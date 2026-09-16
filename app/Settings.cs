@@ -1,4 +1,4 @@
-﻿using GHelper.Ally;
+using GHelper.Ally;
 using GHelper.AnimeMatrix;
 using GHelper.AutoUpdate;
 using GHelper.Battery;
@@ -720,6 +720,10 @@ namespace GHelper
             {
                 Task.Run((Action)RefreshPeripheralsBattery);
                 updateControl.CheckForUpdates();
+            }
+            else
+            {
+                MemoryHelper.TrimAfter();
             }
         }
 
@@ -1640,7 +1644,10 @@ namespace GHelper
 
         public async void RefreshSensors(bool force = false)
         {
-            int throttle = (!Visible && sensorsAlways) ? 6000 : 2000;
+            bool onBattery = SystemInformation.PowerStatus.PowerLineStatus != PowerLineStatus.Online;
+            int throttle = (!Visible && sensorsAlways)
+                ? (onBattery ? 12000 : 6000)
+                : (onBattery ? 3000 : 2000);
             if (!force && Math.Abs(DateTimeOffset.Now.ToUnixTimeMilliseconds() - lastRefresh) < throttle) return;
             lastRefresh = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
